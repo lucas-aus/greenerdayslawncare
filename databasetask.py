@@ -51,5 +51,9 @@ def createtables(cur):
 	FOREIGN KEY("MowerID") REFERENCES "Mowers"("ID"),
 	FOREIGN KEY("ServiceBookingID") REFERENCES "Services-Bookings"("ID"));""")
 
+def wipedatabase(cur, tablelist):
+    for i in tablelist:
+        cur.execute(f"DROP TABLE IF EXIST {i};")
+
 cur = connecttodatabase()
 createtables(cur)

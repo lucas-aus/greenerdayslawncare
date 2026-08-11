@@ -1,0 +1,9 @@
+DROP TABLE IF EXISTS Customers;
+
+DROP TABLE IF EXISTS Bookings;
+
+DROP TABLE IF EXISTS Jobs;
+
+DROP TABLE IF EXISTS Services;
+
+DROP TABLE IF EXISTS Services-Bookings;
