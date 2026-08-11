@@ -46,5 +46,3 @@ CREATE TABLE "Services-Bookings" (
 	FOREIGN KEY("ServiceID") REFERENCES "Services"("ID")
 );
 
-
-
