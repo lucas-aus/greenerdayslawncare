@@ -65,6 +65,38 @@ def wipedatabase(cur, tablelist):
 
 def addsampledata(cur):
     print('adding sample data')
+    cur.execute("""INSERT INTO "Customers" (Name, Surname, Email, PhoneNumber, Password)
+VALUES ('Jacob', 'Hewitt', 'jacobhart@hotmail.com', '0492464541', 'dingdong17'),
+('Paul', 'Holmes', 'hackerman@yahoo.com', '0444221222', 'paulsgardenaccount'),
+('Luke', 'Antonelli', 'lukeyboysemail@gmail.com', '04942987', 'L1R1B1'),
+('Jayden', 'Yap', 'jaydenspersonalemail@outlook.com', '0428371811', 'sillybilly'),
+('Jon', 'Iodine', 'iodinesman@gmail.com', '0411911931', 'chemicalsareneat'),
+('Donald', 'Trump', 'donaldjtrump@gmail.com', '08942931', 'bombiranortheyllexpand');""")
+
+    cur.execute("""INSERT INTO "Bookings" (CustomerID, DateOfWork, DateOrdered, WorkComplete PaymentMethod, HasPaid)
+VALUES (1, '22/08/2026', '24/07/2026', 1, 'Credit Card', 0),
+(3, '17/08/2026', '02/08/2026', 1, 'Credit Card', 0),
+(4, '11/08/2026', '15/07/2026', 1, 'Cash', 1),
+(5, '29/08/2026', '19/08/2026', 0, 'Cash', 0);""")
+
+    cur.execute("""INSERT INTO Services (Name, Cost, Hours)
+VALUES ('Lawn Mowing', 60, 1), 
+('Edging', 40, 0.5),
+('Fertilising', 60, 1),
+('Weed Removal', 60, 1),
+('Garden Clean-Up', 50, 0.75);""")
+
+    cur.execute("""INSERT INTO "Services-Bookings" (BookingID, ServiceID)
+VALUES (1, 1), (1, 2), (2, 1), (3, 1), (3, 3), (4, 1), (4, 4);""")
+
+    cur.execute("""INSERT INTO Mowers (Name, Surname, Email, Password, Owner)
+VALUES ('Nick', 'Lee', 'nick.lee-work@gmail.com', 'nickspassword', 1),
+('Lucas', 'Aitkins', 'l-a-owner-lawncare@outlook.com', 'alfaralto123', 1),
+('Jenna', 'Benson', 'jennasowneremail@gmail.com', 'jennaskey1!', 1),
+('Matthew', 'Champneys', 'matthewtheworker@outlook.com', 'mattsbigemail', 0);""")
+
+    cur.execute("""INSERT INTO Jobs (MowerID, ServiceBookingID, HoursWorked, AmountOwed)
+VALUES (1, 1, 1, 40), (1, 2, 0.5, 25), (2, 3, 0.5, 25), (1, 3, 0.5, 25), (3, 4, 1, 40), (4, 5, 1, 40);""")
     
 
 cur = connecttodatabase()
