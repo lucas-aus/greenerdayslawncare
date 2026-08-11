@@ -41,6 +41,15 @@ def createtables(cur):
         FOREIGN KEY("BookingID") REFERENCES "Bookings"("ID"),
         FOREIGN KEY("ServiceID") REFERENCES "Services"("ID"));""")
 
+    cur.execute("""CREATE TABLE "Mowers" (
+	"ID"	INTEGER NOT NULL UNIQUE,
+	"Name"	TEXT NOT NULL,
+	"Surname"	TEXT NOT NULL,
+	"Email"	TEXT NOT NULL,
+	"Password"	TEXT NOT NULL,
+	"Owner"	INTEGER NOT NULL,
+	PRIMARY KEY("ID" AUTOINCREMENT));""")
+
     cur.execute("""CREATE TABLE "Jobs" (
 	"ID"	INTEGER NOT NULL UNIQUE,
 	"MowerID"	INTEGER NOT NULL,
@@ -60,3 +69,6 @@ def addsampledata(cur):
 
 cur = connecttodatabase()
 createtables(cur)
+choice = input("What do you want to do? ")
+if choice == 'wipe':
+    wipedatabase(cur, ["Jobs", "Service-Bookings", "Mowers", "Services", "Bookings", "Customers"])

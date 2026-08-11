@@ -47,3 +47,11 @@ CREATE TABLE "Services-Bookings" (
 	FOREIGN KEY("ServiceID") REFERENCES "Services"("ID")
 );
 
+CREATE TABLE "Mowers" (
+	"ID"	INTEGER NOT NULL UNIQUE,
+	"Name"	TEXT NOT NULL,
+	"Surname"	TEXT NOT NULL,
+	"Email"	TEXT NOT NULL,
+	"Password"	TEXT NOT NULL,
+	"Owner"	INTEGER NOT NULL,
+	PRIMARY KEY("ID" AUTOINCREMENT));
