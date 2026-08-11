@@ -55,5 +55,8 @@ def wipedatabase(cur, tablelist):
     for i in tablelist:
         cur.execute(f"DROP TABLE IF EXIST {i};")
 
+def addsampledata(cur):
+    
+
 cur = connecttodatabase()
 createtables(cur)
