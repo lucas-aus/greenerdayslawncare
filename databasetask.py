@@ -61,7 +61,7 @@ def createtables(cur):
 
 def wipedatabase(cur, tablelist):
     for i in tablelist:
-        cur.execute(f"DROP TABLE IF EXIST {i};")
+        cur.execute(f"DROP TABLE IF EXISTS {i};")
 
 def addsampledata(cur):
     print('adding sample data')
@@ -72,3 +72,5 @@ createtables(cur)
 choice = input("What do you want to do? ")
 if choice == 'wipe':
     wipedatabase(cur, ["Jobs", "Service-Bookings", "Mowers", "Services", "Bookings", "Customers"])
+elif choice == 'sample data':
+    addsampledata(cur)
