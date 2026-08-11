@@ -20,18 +20,18 @@ def createtables(cur):
 	"CustomerID"	INTEGER NOT NULL,
 	"DateOfWork"	TEXT NOT NULL,
 	"DateOrdered"	TEXT NOT NULL,
+	"WorkComplete"	TEXT NOT NULL,
 	"PaymentMethod"	TEXT NOT NULL,
 	"HasPaid"	INTEGER NOT NULL,
 	PRIMARY KEY("ID" AUTOINCREMENT),
 	FOREIGN KEY("CustomerID") REFERENCES "Customers"("ID"));""")
 
     cur.execute("""CREATE TABLE "Services" (
-        "ID"	INTEGER NOT NULL UNIQUE,
-        "Name"	TEXT NOT NULL UNIQUE,
-        "Cost"	INTEGER NOT NULL,
-        "Hours"	INTEGER NOT NULL,
-        PRIMARY KEY("ID" AUTOINCREMENT)
-    );""")
+	"ID"	INTEGER NOT NULL UNIQUE,
+	"Name"	TEXT NOT NULL UNIQUE,
+	"Cost"	REAL NOT NULL,
+	"Hours"	REAL NOT NULL,
+	PRIMARY KEY("ID" AUTOINCREMENT));""")
 
     cur.execute("""CREATE TABLE "Services-Bookings" (
         "ID"	INTEGER NOT NULL UNIQUE,
@@ -39,8 +39,7 @@ def createtables(cur):
         "BookingID"	INTEGER NOT NULL,
         PRIMARY KEY("ID" AUTOINCREMENT),
         FOREIGN KEY("BookingID") REFERENCES "Bookings"("ID"),
-        FOREIGN KEY("ServiceID") REFERENCES "Services"("ID")
-    );""")
+        FOREIGN KEY("ServiceID") REFERENCES "Services"("ID"));""")
 
     cur.execute("""CREATE TABLE "Jobs" (
 	"ID"	INTEGER NOT NULL UNIQUE,
@@ -56,6 +55,7 @@ def wipedatabase(cur, tablelist):
         cur.execute(f"DROP TABLE IF EXIST {i};")
 
 def addsampledata(cur):
+    print('adding sample data')
     
 
 cur = connecttodatabase()
