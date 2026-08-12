@@ -6,6 +6,7 @@ CREATE TABLE "Bookings" (
 	"WorkComplete"	TEXT NOT NULL,
 	"PaymentMethod"	TEXT NOT NULL,
 	"HasPaid"	INTEGER NOT NULL,
+	"Address"	TEXT,
 	PRIMARY KEY("ID" AUTOINCREMENT),
 	FOREIGN KEY("CustomerID") REFERENCES "Customers"("ID")
 );

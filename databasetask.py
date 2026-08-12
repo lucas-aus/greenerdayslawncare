@@ -18,6 +18,7 @@ def createtables(cur):
 	"WorkComplete"	TEXT NOT NULL,
 	"PaymentMethod"	TEXT NOT NULL,
 	"HasPaid"	INTEGER NOT NULL,
+	"Address"	TEXT,
 	PRIMARY KEY("ID" AUTOINCREMENT),
 	FOREIGN KEY("CustomerID") REFERENCES "Customers"("ID"));""")
 
@@ -69,11 +70,11 @@ VALUES ('Jacob', 'Hewitt', 'jacobhart@hotmail.com', '0492464541', 'dingdong17'),
 ('Jon', 'Iodine', 'iodinesman@gmail.com', '0411911931', 'chemicalsareneat'),
 ('Donald', 'Trump', 'donaldjtrump@gmail.com', '08942931', 'bombiranortheyllexpand');""")
 
-    cur.execute("""INSERT INTO "Bookings" (CustomerID, DateOfWork, DateOrdered, WorkComplete, PaymentMethod, HasPaid)
-VALUES (1, '22/08/2026', '24/07/2026', 1, 'Credit Card', 0),
-(3, '17/08/2026', '02/08/2026', 1, 'Credit Card', 0),
-(4, '11/08/2026', '15/07/2026', 1, 'Cash', 1),
-(5, '29/08/2026', '19/08/2026', 0, 'Cash', 0);""")
+    cur.execute("""INSERT INTO Bookings (CustomerID, DateOfWork, DateOrdered, WorkComplete, PaymentMethod, HasPaid, Address)
+VALUES (1, "22/08/2026", "24/07/2026", 1, "Credit Card", 0, "1 Lenina Avenue"),
+(3, "17/08/2026", "02/08/2026", 1, "Credit Card", 0, "7 Revesby Road"),
+(4, "11/08/2026", "15/07/2026", 1, "Cash", 1, "392 Huntriss Road"),
+(5, "29/08/2026", "19/08/2026", 0, "Cash", 0, "85 Nicholson Road");""")
 
     cur.execute("""INSERT INTO "Services" (Name, Cost, Hours)
 VALUES ('Lawn Mowing', 60, 1), 
