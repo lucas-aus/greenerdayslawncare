@@ -1,10 +1,5 @@
 import sqlite3
 
-def connecttodatabase():
-    con = sqlite3.connect("greenerdayslawncare.db")
-    cur = con.cursor() #This is necessary to allow us to use SQL queries
-    return cur
-
 def createtables(cur):
     cur.execute("""CREATE TABLE "Customers" (
         "ID"	INTEGER NOT NULL UNIQUE,
@@ -54,14 +49,15 @@ def createtables(cur):
 	"ID"	INTEGER NOT NULL UNIQUE,
 	"MowerID"	INTEGER NOT NULL,
 	"ServiceBookingID"	INTEGER NOT NULL,
-	"HoursWorked"	INTEGER NOT NULL,
+	"HoursWorked"	REAL NOT NULL,
+    "AmountOwed"    REAL NOT NULL,
 	PRIMARY KEY("ID" AUTOINCREMENT),
 	FOREIGN KEY("MowerID") REFERENCES "Mowers"("ID"),
 	FOREIGN KEY("ServiceBookingID") REFERENCES "Services-Bookings"("ID"));""")
 
 def wipedatabase(cur, tablelist):
     for i in tablelist:
-        cur.execute(f"DROP TABLE IF EXISTS {i};")
+        cur.execute(f"""DROP TABLE IF EXISTS "{i}";""")
 
 def addsampledata(cur):
     print('adding sample data')
@@ -73,13 +69,13 @@ VALUES ('Jacob', 'Hewitt', 'jacobhart@hotmail.com', '0492464541', 'dingdong17'),
 ('Jon', 'Iodine', 'iodinesman@gmail.com', '0411911931', 'chemicalsareneat'),
 ('Donald', 'Trump', 'donaldjtrump@gmail.com', '08942931', 'bombiranortheyllexpand');""")
 
-    cur.execute("""INSERT INTO "Bookings" (CustomerID, DateOfWork, DateOrdered, WorkComplete PaymentMethod, HasPaid)
+    cur.execute("""INSERT INTO "Bookings" (CustomerID, DateOfWork, DateOrdered, WorkComplete, PaymentMethod, HasPaid)
 VALUES (1, '22/08/2026', '24/07/2026', 1, 'Credit Card', 0),
 (3, '17/08/2026', '02/08/2026', 1, 'Credit Card', 0),
 (4, '11/08/2026', '15/07/2026', 1, 'Cash', 1),
 (5, '29/08/2026', '19/08/2026', 0, 'Cash', 0);""")
 
-    cur.execute("""INSERT INTO Services (Name, Cost, Hours)
+    cur.execute("""INSERT INTO "Services" (Name, Cost, Hours)
 VALUES ('Lawn Mowing', 60, 1), 
 ('Edging', 40, 0.5),
 ('Fertilising', 60, 1),
@@ -89,20 +85,27 @@ VALUES ('Lawn Mowing', 60, 1),
     cur.execute("""INSERT INTO "Services-Bookings" (BookingID, ServiceID)
 VALUES (1, 1), (1, 2), (2, 1), (3, 1), (3, 3), (4, 1), (4, 4);""")
 
-    cur.execute("""INSERT INTO Mowers (Name, Surname, Email, Password, Owner)
+    cur.execute("""INSERT INTO "Mowers" (Name, Surname, Email, Password, Owner)
 VALUES ('Nick', 'Lee', 'nick.lee-work@gmail.com', 'nickspassword', 1),
 ('Lucas', 'Aitkins', 'l-a-owner-lawncare@outlook.com', 'alfaralto123', 1),
 ('Jenna', 'Benson', 'jennasowneremail@gmail.com', 'jennaskey1!', 1),
 ('Matthew', 'Champneys', 'matthewtheworker@outlook.com', 'mattsbigemail', 0);""")
 
-    cur.execute("""INSERT INTO Jobs (MowerID, ServiceBookingID, HoursWorked, AmountOwed)
+    cur.execute("""INSERT INTO "Jobs" (MowerID, ServiceBookingID, HoursWorked, AmountOwed)
 VALUES (1, 1, 1, 40), (1, 2, 0.5, 25), (2, 3, 0.5, 25), (1, 3, 0.5, 25), (3, 4, 1, 40), (4, 5, 1, 40);""")
     
 
-cur = connecttodatabase()
-createtables(cur)
+con = sqlite3.connect("greenerdayslawncare.db")
+cur = con.cursor() #This is necessary to allow us to use SQL queries
+
 choice = input("What do you want to do? ")
 if choice == 'wipe':
-    wipedatabase(cur, ["Jobs", "Service-Bookings", "Mowers", "Services", "Bookings", "Customers"])
+    wipedatabase(cur, ["Jobs", "Services-Bookings", "Mowers", "Services", "Bookings", "Customers"])
 elif choice == 'sample data':
     addsampledata(cur)
+if choice == 'create':
+    createtables(cur)
+
+con.commit()
+cur.close()
+con.close()
