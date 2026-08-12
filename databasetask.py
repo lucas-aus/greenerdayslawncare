@@ -90,7 +90,7 @@ VALUES (1, 1), (1, 2), (2, 1), (3, 1), (3, 3), (4, 1), (4, 4);""")
 VALUES ("Nick", "Lee", "nick.lee-work@gmail.com", "nickspassword", 1),
 ("Lucas", "Aitkins", "l-a-owner-lawncare@outlook.com", "alfaralto123", 1),
 ("Jenna", "Benson", "jennasowneremail@gmail.com", "jennaskey1!", 1),
-("Matthew", "Champneys", "matthewtheworker@outlook.com", "mattsbigboyaccount", 0)
+("Matthew", "Champneys", "matthewtheworker@outlook.com", "mattsbigboyaccount", 0),
 ("Ben", "Dover", "bendover@outlook.com", "gardening@52years", 0);""")
 
     cur.execute("""INSERT INTO Jobs (MowerID, ServiceBookingID, HoursWorked, AmountOwed)
