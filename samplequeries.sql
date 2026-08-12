@@ -37,7 +37,7 @@ OR ID NOT IN (
 	FROM Jobs
 	JOIN "Services-Bookings" ON "Services-Bookings".ID = Jobs.ServiceBookingID
 	JOIN Bookings ON Bookings.ID = "Services-Bookings".BookingID
-	WHERE Bookings.DateOfWork > date('now', '-365 days'))
+	WHERE Bookings.DateOfWork > date('now', '-365 days') AND Jobs.MowerID IS NOT NULL)
 --this query deletes workers that have either: not done a job, or not worked any hours for the last year
 --this query could be useful if the company is hypothetically trying to lay off workers for productivity
 
