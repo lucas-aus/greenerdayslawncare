@@ -1,7 +1,9 @@
-SELECT CustomerID, DateOfWork, PaymentMethod, HasPaid
-FROM "Bookings"
-WHERE DateOfWork < CURRENT_DATE;
--- a simple query that shows past bookings from a customer
+SELECT Mowers.Name, Mowers.Surname, SUM(Jobs.HoursWorked)
+FROM "Mowers"
+JOIN Jobs ON Jobs.MowerID = Mowers.ID
+GROUP BY Jobs.MowerID
+-- this query shows all the hours worked for each mower
+
 
 SELECT Services.Name, Services.Hours, Bookings.DateOfWork, Bookings.Address
 FROM "Mowers"
@@ -9,8 +11,8 @@ JOIN Jobs ON Jobs.MowerID = Mowers.ID
 JOIN "Services-Bookings" ON "Services-Bookings".ID = Jobs.ServiceBookingID
 JOIN Services ON Services.ID = "Services-Bookings".ServiceID
 JOIN Bookings ON Bookings.ID = "Services-Bookings".BookingID
-WHERE DateOfWork > CURRENT_DATE AND Mowers.Name == "Nick";
--- this query will find all of the service names, hours required, dates and addresses for Nick's jobs
+WHERE DateOfWork > CURRENT_DATE AND Mowers.ID == 1;
+-- this query will find all of the service names, hours required, dates and addresses for Nick Lee (Mower 1)'s jobs
 
 UPDATE Jobs
 SET MowerID = 4
@@ -41,3 +43,14 @@ OR ID NOT IN (
 --this query deletes workers that have either: not done a job, or not worked any hours for the last year
 --this query could be useful if the company is hypothetically trying to lay off workers for productivity
 
+BEGIN TRANSACTION;
+
+INSERT INTO Customers (ID, Name, Surname, Email, PhoneNumber, Password)
+VALUES (7, 'Bill', 'Johnson', 'billsemail@gmail.com', '0462645734', 'billslogin');
+
+INSERT INTO Bookings (CustomerID, DateOfWork, DateOrdered, WorkComplete, PaymentMethod, HasPaid, Address)
+VALUES (7, '2026-08-29', DATE('now'), 0, 'Cash', 0, '4 Elderberry Crescent');
+
+COMMIT;
+--adds values to both customers and bookings
+--they are grouped as a transaction to ensure the booking information is not added unless the customer is added - ensuring data validity
