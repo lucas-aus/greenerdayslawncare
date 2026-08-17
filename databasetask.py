@@ -1,4 +1,7 @@
 import sqlite3
+import sys
+import subprocess
+import time
 
 def createtables(cur):
     cur.execute("""CREATE TABLE IF NOT EXISTS "Customers" (
@@ -101,11 +104,33 @@ def validateinput(question, validinputs, errormessage):
         userinput = input(question)
         if userinput in validinputs:
             return userinput
+        elif userinput == "exit":
+            sys.exit()
         else:
             print(errormessage)
 
+def clear_screen():
+    # Use 'cls' for Windows, 'clear' for Linux/macOS
+    command = 'cls' if sys.platform == 'win32' else 'clear'
+    subprocess.run(command, shell=True)
+
 def customerinterface():
-    print("customer")
+    time.sleep(0.5)
+    clear_screen()
+    loginchoice = validateinput("Do you want to log in to an existing account or create a new account? (log in or create account) ", ["log in", "create account"], "Please input one of the options: log in or create account")
+    if loginchoice == "log in":
+        login()
+    elif loginchoice == "create account":
+        createaccount()
+
+def createaccount():
+    print("creating account")
+
+def login():
+    print("logging in")
+    cur.execute("SELECT Email FROM Customers")
+    emails = [row[0] for row in cur.fetchall()]
+    useremail = validateinput("WHat is the email associated with your account? ", emails, "Please input an email associated with an account.")
 
 def employeeinterface():
     print('employee')
