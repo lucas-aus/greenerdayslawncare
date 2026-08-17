@@ -109,23 +109,68 @@ def validateinput(question, validinputs, errormessage):
         else:
             print(errormessage)
 
-def clear_screen():
-    # Use 'cls' for Windows, 'clear' for Linux/macOS
+def clearscreen():
+    #ckears the screen, using 'cls' for windows computers and 'clear' for everything else (bc apparently thats what you're supposed to do)
     command = 'cls' if sys.platform == 'win32' else 'clear'
     subprocess.run(command, shell=True)
 
 def customerinterface():
     time.sleep(0.5)
-    clear_screen()
+    clearscreen()
     loginchoice = validateinput("Do you want to log in to an existing account or create a new account? (log in or create account) ", ["log in", "create account"], "Please input one of the options: log in or create account")
     if loginchoice == "log in":
         email = login()
-        print(email)
     elif loginchoice == "create account":
         createaccount()
+    clearscreen()
 
-def createaccount():
+def createaccount(): #simply asks for information for a Customer record, and then puts it into the database.
     print("creating account")
+    name = input("What is your first name? ")
+    while " " in name or len(name) > 20: #This is not in the validate input function because it has length and content requirements ratehr than being from a list
+        print("Ensure there are no spaces, and the length is less than 20.")
+        name = input("What is your first name? ")
+    print("")
+    surname = input("What is your surname? ")
+    while " " in surname or len(surname) > 30:
+        print("Ensure there are no spaces, and the length is less than 30.")
+        surname = input("What is your surname? ")
+    print("")
+    email = input("What is the email? ")
+    cur.execute("SELECT Email FROM Customers;")
+    emails = [row[0] for row in cur.fetchall()]
+    while " " in email or len(email) > 40 or email in emails:
+        print("Ensure length is less than 40, there are no spaces, and the email is not already in use.")
+        email = input("What is your email? ")
+    print("")
+    while True:
+        phone = input("What is your phone number? ")
+        try:
+            int(phone) #tests to see if only numbers in phone number
+            if len(phone) <= 10:
+                break
+        except:
+            print("Phone number must only use numbers")
+        print("Please input a valid phone number.")
+    print("")
+    password = input("What is the password you want associated with the account? ")
+    while len(password) < 5 or len(password) > 15:
+        print("Please input valid password.")
+        password = input("What is the password you want associated with the account? ")
+    clearscreen()
+    print(f"""First Name: {name}
+Surname: {surname}
+Email: {email}
+Phone Number: {phone}
+Password: {password}""")
+    print("")
+    confirm = input("Are these details okay? ")
+    while confirm not in ['yes', 'no', 'y', 'n', 'affirmative', 'negative', 'Yes', 'No', 'YES', 'NO']:
+        confirm = input("Are these details okay? ")
+    if confirm in ['yes', 'y', 'affirmative', 'Yes', 'YES']:
+        cur.execute(f"INSERT INTO Customers (Name, Surname, Email, PhoneNumber, Password) VALUES ('{name}', '{surname}', '{email}', '{phone}', '{password}');")
+        con.commit()
+    customerinterface() #sends back to the beginning of customer interface, meaning that they can log in if they want.
 
 def login():
     print("logging in")
@@ -134,7 +179,7 @@ def login():
     useremail = validateinput("What is the email associated with your account? ", emails, "Please input an email associated with an account.")
     cur.execute(f"""SELECT Password FROM Customers WHERE Email = "{useremail}";""") #finds the associated password
     password = cur.fetchone()[0]
-    validateinput(f"What is the password associated with the account with {useremail} email? ", password, "Incorrect. Please try again.")
+    validateinput(f"What is the password associated with the account with {useremail}? ", password, "Incorrect. Please try again.")
     return useremail
     
 
