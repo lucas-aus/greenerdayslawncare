@@ -1,7 +1,7 @@
 import sqlite3
 
 def createtables(cur):
-    cur.execute("""CREATE TABLE "Customers" (
+    cur.execute("""CREATE TABLE IF NOT EXISTS "Customers" (
         "ID"	INTEGER NOT NULL UNIQUE,
         "Name"	TEXT NOT NULL,
         "Surname"	TEXT NOT NULL,
@@ -10,7 +10,7 @@ def createtables(cur):
         "Password"	TEXT NOT NULL,
         PRIMARY KEY("ID" AUTOINCREMENT));""")
     
-    cur.execute("""CREATE TABLE "Bookings" (
+    cur.execute("""CREATE TABLE IF NOT EXISTS "Bookings" (
 	"ID"	INTEGER NOT NULL UNIQUE,
 	"CustomerID"	INTEGER NOT NULL,
 	"DateOfWork"	TEXT NOT NULL,
@@ -22,14 +22,14 @@ def createtables(cur):
 	PRIMARY KEY("ID" AUTOINCREMENT),
 	FOREIGN KEY("CustomerID") REFERENCES "Customers"("ID"));""")
 
-    cur.execute("""CREATE TABLE "Services" (
+    cur.execute("""CREATE TABLE IF NOT EXISTS "Services" (
 	"ID"	INTEGER NOT NULL UNIQUE,
 	"Name"	TEXT NOT NULL UNIQUE,
 	"Cost"	REAL NOT NULL,
 	"Hours"	REAL NOT NULL,
 	PRIMARY KEY("ID" AUTOINCREMENT));""")
 
-    cur.execute("""CREATE TABLE "Services-Bookings" (
+    cur.execute("""CREATE TABLE IF NOT EXISTS "Services-Bookings" (
         "ID"	INTEGER NOT NULL UNIQUE,
         "ServiceID"	INTEGER NOT NULL,
         "BookingID"	INTEGER NOT NULL,
@@ -37,7 +37,7 @@ def createtables(cur):
         FOREIGN KEY("BookingID") REFERENCES "Bookings"("ID"),
         FOREIGN KEY("ServiceID") REFERENCES "Services"("ID"));""")
 
-    cur.execute("""CREATE TABLE "Mowers" (
+    cur.execute("""CREATE TABLE IF NOT EXISTS "Mowers" (
 	"ID"	INTEGER NOT NULL UNIQUE,
 	"Name"	TEXT NOT NULL,
 	"Surname"	TEXT NOT NULL,
@@ -46,7 +46,7 @@ def createtables(cur):
 	"Owner"	INTEGER NOT NULL,
 	PRIMARY KEY("ID" AUTOINCREMENT));""")
 
-    cur.execute("""CREATE TABLE "Jobs" (
+    cur.execute("""CREATE TABLE IF NOT EXISTS "Jobs" (
 	"ID"	INTEGER NOT NULL UNIQUE,
 	"MowerID"	INTEGER NOT NULL,
 	"ServiceBookingID"	INTEGER NOT NULL,
@@ -95,7 +95,35 @@ VALUES ("Nick", "Lee", "nick.lee-work@gmail.com", "nickspassword", 1),
 
     cur.execute("""INSERT INTO Jobs (MowerID, ServiceBookingID, HoursWorked, AmountOwed)
 VALUES (1, 1, 1, 40), (1, 2, 0.5, 25), (2, 3, 0.5, 25), (1, 3, 0.5, 25), (3, 4, 1, 40), (4, 5, 1, 40), (1, 6, 0, 0);""")
-    
+
+def validateinput(question, validinputs, errormessage):
+    while True:
+        userinput = input(question)
+        if userinput in validinputs:
+            return userinput
+        else:
+            print(errormessage)
+
+def customerinterface():
+    print("customer")
+
+def employeeinterface():
+    print('employee')
+
+def ownerinterface():
+    print('owner')
+           
+con = sqlite3.connect("greenerdayslawncare.db") #connects or creates the database file
+cur = con.cursor() #This is necessary to allow us to use SQL queries
+createtables(cur) #will create the tables if they don't exist
+
+usertype = validateinput("Are you a customer, mower, or an owner? ", ['customer', 'mower', 'owner'], "Please enter one of the following values: employee, owner, or mower")
+if usertype == 'customer':
+    customerinterface()
+elif usertype == 'mower':
+    employeeinterface()
+elif usertype == 'owner':
+    ownerinterface()
 
 while True:
     con = sqlite3.connect("greenerdayslawncare.db")
@@ -106,8 +134,6 @@ while True:
         wipedatabase(cur, ["Jobs", "Services-Bookings", "Mowers", "Services", "Bookings", "Customers"])
     elif choice == 'sample data':
         addsampledata(cur)
-    if choice == 'create':
-        createtables(cur)
 
     con.commit()
     cur.close()
