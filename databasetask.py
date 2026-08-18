@@ -128,6 +128,8 @@ def customerinterface():
         changecustomerdetails(email)
     elif editoradd == 'add booking':
         addbooking(email)
+    elif editoradd == 'edit booking':
+        editbooking(email)
 
 def changecustomerdetails(email):
     element = validateinput("What would you like to change about your account? (name, surname, email, phone number, or password) ", ['name', 'surname', 'email', 'phone number', 'password'], "Please choose one of: name, surname, email, phone number, or password")
@@ -135,6 +137,25 @@ def changecustomerdetails(email):
     if element == "phone number":
         element = "PhoneNumber"
     cur.execute(f"""UPDATE Customers SET "{element}" = '{newvalue}' WHERE Email = '{email}'; """)
+    con.commit()
+    customerinterface()
+
+def editbooking(email):
+    print("")
+    cur.execute(f"""SELECT Bookings.DateOfWork FROM Bookings JOIN Customers ON Customers.ID = Bookings.CustomerID WHERE Customers.Email = "{email}";""")
+    bookings = [row[0] for row in cur.fetchall()]
+    cur.execute(f"""SELECT DISTINCT Bookings.CustomerID FROM Bookings JOIN Customers ON Customers.ID = Bookings.CustomerID WHERE Customers.Email = "{email}";""")
+    id = str([row[0] for row in cur.fetchall()][0])
+    date = validateinput("What date is the booking you would like to change set for? Enter in YYYY-MM-DD format ", bookings, "Please answer a date with a booking.")
+    element = validateinput("Which element of your booking would you like to change? (date of work, payment method, or address) ", ["date of work", 'payment method', 'address'], "Please enter date of work, payment method, or address.")
+    if element == "date of work":
+        element = "DateOfWork"
+    elif element == "payment method":
+        element = "PaymentMethod"
+    elif element == "address":
+        element = "Address"
+    newvalue = input("What would you like to change this element to? ")
+    cur.execute(f"""UPDATE Bookings SET {element} = '{newvalue}' WHERE Bookings.CustomerID = {id};""")
     con.commit()
     customerinterface()
 
