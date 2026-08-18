@@ -73,31 +73,31 @@ VALUES ("Jacob", "Hewitt", "jacobhewitt@hotmail.com", "0492464541", "dingdong17"
 ("Jon", "Iodine", "iodinesman@gmail.com", "0411911931", "chemicalsareneat"),
 ("Donald", "Trump", "donaldjtrump@gmail.com", "08942931", "bombiranortheyllexpand");""")
 
-    cur.execute("""INSERT OR IGNORE INTO Bookings (CustomerID, DateOfWork, DateOrdered, WorkComplete, PaymentMethod, HasPaid, Address)
-VALUES (1, "2026-08-19", "2026-07-24", 1, "Credit Card", 0, "1 Lenina Avenue"),
-(3, "2026-08-17", "2026-08-02", 1, "Credit Card", 0, "7 Revesby Road"),
-(4, "2026-08-11", "2026-07-15", 1, "Cash", 1, "392 Huntriss Road"),
-(5, "2026-09-07", "2026-08-19", 0, "Cash", 0, "85 Nicholson Road");""")
+    cur.execute("""INSERT OR IGNORE INTO Bookings (ID, CustomerID, DateOfWork, DateOrdered, WorkComplete, PaymentMethod, HasPaid, Address)
+VALUES (1, 1, "2026-08-19", "2026-07-24", 1, "Credit Card", 0, "1 Lenina Avenue"),
+(2, 3, "2026-08-17", "2026-08-02", 1, "Credit Card", 0, "7 Revesby Road"),
+(3, 4, "2026-08-11", "2026-07-15", 1, "Cash", 1, "392 Huntriss Road"),
+(4, 5, "2026-09-07", "2026-08-19", 0, "Cash", 0, "85 Nicholson Road");""")
 
-    cur.execute("""INSERT OR IGNORE INTO "Services" (Name, Cost, Hours)
-VALUES ('Lawn Mowing', 60, 1), 
-('Edging', 40, 0.5),
-('Fertilising', 60, 1),
-('Weed Removal', 60, 1),
-('Garden Clean-Up', 50, 0.75);""")
+    cur.execute("""INSERT OR IGNORE INTO "Services" (ID, Name, Cost, Hours)
+VALUES (1, 'Lawn Mowing', 60, 1), 
+(2, 'Edging', 40, 0.5),
+(3, 'Fertilising', 60, 1),
+(4, 'Weed Removal', 60, 1),
+(5, 'Garden Clean-Up', 50, 0.75);""")
 
-    cur.execute("""INSERT OR IGNORE INTO "Services-Bookings" (BookingID, ServiceID)
-VALUES (1, 1), (1, 2), (2, 1), (3, 1), (3, 3), (4, 1), (4, 4);""")
+    cur.execute("""INSERT OR IGNORE INTO "Services-Bookings" (ID, BookingID, ServiceID)
+VALUES (1, 1, 1), (2, 1, 2), (3, 2, 1), (4, 3, 1), (5, 3, 3), (6, 4, 1), (7, 4, 4);""")
 
-    cur.execute("""INSERT OR IGNORE INTO Mowers (Name, Surname, Email, Password, Owner)
-VALUES ("Nick", "Lee", "nick.lee-work@gmail.com", "nickspassword", 1),
-("Lucas", "Aitkins", "l-a-owner-lawncare@outlook.com", "alfaralto123", 1),
-("Jenna", "Benson", "jennasowneremail@gmail.com", "jennaskey1!", 1),
-("Matthew", "Champneys", "matthewtheworker@outlook.com", "mattsbigboyaccount", 0),
-("Ben", "Dover", "bendover@outlook.com", "gardening@52years", 0);""")
+    cur.execute("""INSERT OR IGNORE INTO Mowers (ID, Name, Surname, Email, Password, Owner)
+VALUES (1, "Nick", "Lee", "nick.lee-work@gmail.com", "nickspassword", 1),
+(2, "Lucas", "Aitkins", "l-a-owner-lawncare@outlook.com", "alfaralto123", 1),
+(3, "Jenna", "Benson", "jennasowneremail@gmail.com", "jennaskey1!", 1),
+(4, "Matthew", "Champneys", "matthewtheworker@outlook.com", "mattsbigboyaccount", 0),
+(5, "Ben", "Dover", "bendover@outlook.com", "gardening@52years", 0);""")
 
-    cur.execute("""INSERT OR IGNORE INTO Jobs (MowerID, ServiceBookingID, HoursWorked, AmountOwed)
-VALUES (1, 1, 1, 40), (1, 2, 0.5, 25), (2, 3, 0.5, 25), (1, 3, 0.5, 25), (3, 4, 1, 40), (4, 5, 1, 40), (1, 6, 0, 0);""")
+    cur.execute("""INSERT OR IGNORE INTO Jobs (ID, MowerID, ServiceBookingID, HoursWorked, AmountOwed)
+VALUES (1, 1, 1, 1, 40), (2, 1, 2, 0.5, 25), (3, 2, 3, 0.5, 25), (4, 1, 3, 0.5, 25), (5, 3, 4, 1, 40), (6, 4, 5, 1, 40), (7, 1, 6, 0, 0);""")
 
 def validateinput(question, validinputs, errormessage):
     while True:
@@ -132,11 +132,25 @@ def customerinterface():
 def changecustomerdetails(email):
     element = validateinput("What would you like to change about your account? (name, surname, email, phone number, or password) ", ['name', 'surname', 'email', 'phone number', 'password'], "Please choose one of: name, surname, email, phone number, or password")
     newvalue = input(f"What would you like to change your {element} to? ")
-    cur.execute(f"""UPDATE Customers SET {element} = "{newvalue}" WHERE Email = "{email}"; """)
+    if element == "phone number":
+        element = "PhoneNumber"
+    cur.execute(f"""UPDATE Customers SET "{element}" = '{newvalue}' WHERE Email = '{email}'; """)
+    con.commit()
     customerinterface()
 
 def addbooking(email):
+    print("")
     print("Adding booking details")
+    dateofwork = input("What date would you like the work to occur? Enter in format YYYY-MM-DD ")
+    while len(dateofwork) != 10:
+        print("Ensure you enter in format YYYY-MM-DD.")
+        dateofwork = input("What date would you like the work to occur? ")
+    paymentmethod = validateinput("How will you pay? (Credit Card or Cash) ", ["Credit Card", "Cash"], "Please enter either credit card or cash.")
+    address = input("Please enter the address of the house you would like the work done at. ")
+    cur.execute(f"""INSERT INTO Bookings (CustomerID, DateOfWork, DateOrdered, WorkComplete, PaymentMethod, HasPaid, Address)
+    VALUES ((SELECT Customers.ID FROM Customers WHERE Email = "{email}"), "{dateofwork}", "date('now')", 0, "{paymentmethod}", 0, "{address}");""")
+    con.commit()
+    customerinterface()
         
 
 def createaccount(): #simply asks for information for a Customer record, and then puts it into the database.
@@ -208,6 +222,7 @@ con = sqlite3.connect("greenerdayslawncare.db") #connects or creates the databas
 cur = con.cursor() #This is necessary to allow us to use SQL queries
 createtables(cur) #will create the tables if they don't exist
 addsampledata(cur) #adds sample data only if it is not already there
+con.commit()
 
 usertype = validateinput("Are you a customer, mower, or an owner? ", ['customer', 'mower', 'owner'], "Please enter one of the following values: employee, owner, or mower")
 if usertype == 'customer':
