@@ -1,16 +1,16 @@
-SELECT Mowers.Name, Mowers.Surname, SUM(Jobs.HoursWorked)
+SELECT CONCAT(Mowers.Name, ' ', Mowers.Surname), SUM(Jobs.HoursWorked), AVG(Jobs.HoursWorked)
 FROM "Mowers"
 JOIN Jobs ON Jobs.MowerID = Mowers.ID
 GROUP BY Jobs.MowerID
--- this query shows all the hours worked for each mower
+-- this query shows all the hours worked for each mower and the average for 
 
 
 SELECT Services.Name, Services.Hours, Bookings.DateOfWork, Bookings.Address
 FROM "Mowers"
 JOIN Jobs ON Jobs.MowerID = Mowers.ID
-JOIN "Services-Bookings" ON "Services-Bookings".ID = Jobs.ServiceBookingID
-JOIN Services ON Services.ID = "Services-Bookings".ServiceID
-JOIN Bookings ON Bookings.ID = "Services-Bookings".BookingID
+JOIN "Services-Bookings" AS SB ON SB.ID = Jobs.ServiceBookingID
+JOIN Services ON Services.ID = SB.ServiceID
+JOIN Bookings ON Bookings.ID = SB.BookingID
 WHERE DateOfWork > CURRENT_DATE AND Mowers.ID == 1;
 -- this query will find all of the service names, hours required, dates and addresses for Nick Lee (Mower 1)'s jobs
 

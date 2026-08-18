@@ -65,13 +65,13 @@ def wipedatabase(cur, tablelist): #will remove all of the tables from the databa
 
 def addsampledata(cur): #adds all of the sample data if it doesnt exist yet
     print('adding sample data')
-    cur.execute("""INSERT OR IGNORE INTO "Customers" (Name, Surname, Email, PhoneNumber, Password)
-VALUES ('Jacob', 'Hewitt', 'jacobhart@hotmail.com', '0492464541', 'dingdong17'),
-('Paul', 'Holmes', 'hackerman@yahoo.com', '0444221222', 'paulsgardenaccount'),
-('Luke', 'Antonelli', 'lukeyboysemail@gmail.com', '04942987', 'L1R1B1'),
-('Jayden', 'Yap', 'jaydenspersonalemail@outlook.com', '0428371811', 'sillybilly'),
-('Jon', 'Iodine', 'iodinesman@gmail.com', '0411911931', 'chemicalsareneat'),
-('Donald', 'Trump', 'donaldjtrump@gmail.com', '08942931', 'bombiranortheyllexpand');""")
+    cur.execute("""INSERT OR IGNORE INTO Customers (Name, Surname, Email, PhoneNumber, Password)
+VALUES ("Jacob", "Hewitt", "jacobhewitt@hotmail.com", "0492464541", "dingdong17"),
+("Paul", "Holmes", "hackerman@yahoo.com", "0444221222", "paulsgardenaccount"),
+("Luke", "Antonelli", "lukeyboysemail@gmail.com", "04942987", "L1R1B1"),
+("Jayden", "Yap", "jaydenspersonalemail@outlook.com", "0428371811", "sillybilly"),
+("Jon", "Iodine", "iodinesman@gmail.com", "0411911931", "chemicalsareneat"),
+("Donald", "Trump", "donaldjtrump@gmail.com", "08942931", "bombiranortheyllexpand");""")
 
     cur.execute("""INSERT OR IGNORE INTO Bookings (CustomerID, DateOfWork, DateOrdered, WorkComplete, PaymentMethod, HasPaid, Address)
 VALUES (1, "2026-08-19", "2026-07-24", 1, "Credit Card", 0, "1 Lenina Avenue"),
@@ -123,6 +123,21 @@ def customerinterface():
     elif loginchoice == "create account":
         createaccount()
     clearscreen()
+    editoradd = validateinput("Would you like to edit a booking, add a booking, or change customer details? (edit booking, add booking, or change details)? ", ["edit booking", "add booking", "change details"], "Please enter either edit booking, add booking, or change details.")
+    if editoradd == 'change details':
+        changecustomerdetails(email)
+    elif editoradd == 'add booking':
+        addbooking(email)
+
+def changecustomerdetails(email):
+    element = validateinput("What would you like to change about your account? (name, surname, email, phone number, or password) ", ['name', 'surname', 'email', 'phone number', 'password'], "Please choose one of: name, surname, email, phone number, or password")
+    newvalue = input(f"What would you like to change your {element} to? ")
+    cur.execute(f"""UPDATE Customers SET {element} = "{newvalue}" WHERE Email = "{email}"; """)
+    customerinterface()
+
+def addbooking(email):
+    print("Adding booking details")
+        
 
 def createaccount(): #simply asks for information for a Customer record, and then puts it into the database.
     print("creating account")

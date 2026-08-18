@@ -1,5 +1,5 @@
 INSERT OR IGNORE INTO Customers (Name, Surname, Email, PhoneNumber, Password)
-VALUES ("Jacob", "Hewitt", "jacobhart@hotmail.com", "0492464541", "dingdong17"),
+VALUES ("Jacob", "Hewitt", "jacobhewitt@hotmail.com", "0492464541", "dingdong17"),
 ("Paul", "Holmes", "hackerman@yahoo.com", "0444221222", "paulsgardenaccount"),
 ("Luke", "Antonelli", "lukeyboysemail@gmail.com", "04942987", "L1R1B1"),
 ("Jayden", "Yap", "jaydenspersonalemail@outlook.com", "0428371811", "sillybilly"),
