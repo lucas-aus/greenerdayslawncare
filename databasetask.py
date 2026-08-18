@@ -64,7 +64,6 @@ def wipedatabase(cur, tablelist): #will remove all of the tables from the databa
         cur.execute(f"""DROP TABLE IF EXISTS "{i}";""")
 
 def addsampledata(cur): #adds all of the sample data if it doesnt exist yet
-    print('adding sample data')
     cur.execute("""INSERT OR IGNORE INTO Customers (Name, Surname, Email, PhoneNumber, Password)
 VALUES ("Jacob", "Hewitt", "jacobhewitt@hotmail.com", "0492464541", "dingdong17"),
 ("Paul", "Holmes", "hackerman@yahoo.com", "0444221222", "paulsgardenaccount"),
@@ -234,7 +233,29 @@ def login():
     
 
 def employeeinterface():
-    print('employee')
+    clearscreen()
+    cur.execute("SELECT Mowers.Email FROM Mowers")
+    emaillist = [row[0] for row in cur.fetchall()]
+    email = validateinput("What is your employee email? ", emaillist, "Please answer a valid employee email.")
+    action = validateinput("Would you like to log hours or edit employee information? (log hours or edit info) ", ["log hours", "edit info"], "Please answer log hours or edit info.")
+    if action == "log hours":
+        loghours(email)
+    elif action == "edit info":
+        editinfo(email)
+
+def loghours(email):
+    cur.execute(f"""SELECT Bookings.DateOfWork, Jobs.ID FROM Jobs JOIN "Services-Bookings" AS sb ON sb.ID = Jobs.ServiceBookingID JOIN Bookings ON Bookings.ID = sb.BookingID JOIN Mowers ON Mowers.ID = Jobs.MowerID WHERE Mowers.Email == '{email}';""")
+    jobs = cur.fetchall()
+    datelist = [row[0] for row in jobs]
+    date = validateinput("What date was the job on? ", datelist, "Please pick a valid date that work occurred.")
+    hours = int(input("How many hours would you like to log?"))
+    jobid = next(row[1] for row in jobs if row[0] == date)
+    cur.execute(f"""UPDATE Jobs SET Jobs.HoursWorked = {hours} WHERE Jobs.ID = {jobid};""")
+    con.commit()
+
+def editinfo(email):
+    print("editing info")
+
 
 def ownerinterface():
     print('owner')
