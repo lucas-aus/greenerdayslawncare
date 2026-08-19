@@ -254,8 +254,11 @@ def loghours(email):
     con.commit()
 
 def editinfo(email):
-    print("editing info")
-
+    element = validateinput("What element would you like to change? (name, surname, email, password) ", ["name", "surname", "email", "password"], "Please choose one of (name, surname, email, password)")
+    newvalue = input("What would you like to change it to? ")
+    cur.execute(f"""UPDATE Mowers SET "{element}" = '{newvalue}' WHERE Email = '{email}'""")
+    con.commit()
+    employeeinterface()
 
 def ownerinterface():
     print('owner')
