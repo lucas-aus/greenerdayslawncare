@@ -321,6 +321,8 @@ def ownerinterface():
         cur.execute(f"{sql}")
         con.commit()
     elif wipeorexecute == 'wipe':
+        print("")
+        confirm = validateinput("Are you sure you would like to wipe the database? This cannot be undone. (yes/no) ", ['yes', 'no'], "Please answer either yes or no.")
         wipedatabase()
     main()
 
