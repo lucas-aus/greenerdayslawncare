@@ -2,6 +2,7 @@ SELECT CONCAT(Mowers.Name, ' ', Mowers.Surname), SUM(Jobs.HoursWorked), AVG(Jobs
 FROM "Mowers"
 JOIN Jobs ON Jobs.MowerID = Mowers.ID
 GROUP BY Jobs.MowerID
+ORDER BY Jobs.MowerID
 -- this query shows all the hours worked for each mower and the average for 
 
 

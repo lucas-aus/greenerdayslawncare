@@ -98,7 +98,7 @@ VALUES (1, "Nick", "Lee", "nick.lee-work@gmail.com", "nickspassword", 1),
     cur.execute("""INSERT OR IGNORE INTO Jobs (ID, MowerID, ServiceBookingID, HoursWorked, AmountOwed)
 VALUES (1, 1, 1, 1, 40), (2, 1, 2, 0.5, 25), (3, 2, 3, 0.5, 25), (4, 1, 3, 0.5, 25), (5, 3, 4, 1, 40), (6, 4, 5, 1, 40), (7, 1, 6, 0, 0);""")
 
-def validateinput(question, validinputs, errormessage):
+def validateinput(question, validinputs, errormessage): #validates that an input is in a list of options
     while True:
         userinput = input(question)
         if userinput in validinputs:
@@ -109,11 +109,11 @@ def validateinput(question, validinputs, errormessage):
             print(errormessage)
 
 def clearscreen():
-    #ckears the screen, using 'cls' for windows computers and 'clear' for everything else (bc apparently thats what you're supposed to do)
+    #clears the screen, using 'cls' for windows computers and 'clear' for everything else (bc apparently thats what you're supposed to do)
     command = 'cls' if sys.platform == 'win32' else 'clear'
     subprocess.run(command, shell=True)
 
-def customerinterface():
+def customerinterface(): #interface for customers to use
     time.sleep(0.5)
     clearscreen()
     loginchoice = validateinput("Do you want to log in to an existing account or create a new account? (log in or create account) ", ["log in", "create account"], "Please input one of the options: log in or create account")
@@ -122,13 +122,30 @@ def customerinterface():
     elif loginchoice == "create account":
         createaccount()
     clearscreen()
-    editoradd = validateinput("Would you like to edit a booking, add a booking, or change customer details? (edit booking, add booking, or change details)? ", ["edit booking", "add booking", "change details"], "Please enter either edit booking, add booking, or change details.")
+    editoradd = validateinput("Would you like to edit a booking, add a booking, change customer details, or view a booking? (edit booking, add booking, change details, or view booking)? ", ["edit booking", "add booking", "change details", "view booking"], "Please enter either edit booking, add booking, change details, or view booking.")
     if editoradd == 'change details':
         changecustomerdetails(email)
     elif editoradd == 'add booking':
         addbooking(email)
     elif editoradd == 'edit booking':
         editbooking(email)
+    if editoradd == 'view booking':
+        viewbooking(email)
+    main()
+
+def viewbooking(email):
+    cur.execute(f"""SELECT Bookings.DateOfWork FROM Bookings JOIN Customers ON Bookings.CustomerID = Customers.ID WHERE Customers.Email = '{email}';""")
+    bookings = [row[0] for row in cur.fetchall()]
+    cur.execute(f"""SELECT Bookings.CustomerID FROM Bookings JOIN Customers ON Bookings.CustomerID = Customers.ID WHERE Customers.Email = '{email}';""")
+    id = [row[0] for row in cur.fetchall()][0]
+    #collects all of the dates and IDs for the bookings associated with the customer
+    date = validateinput("What date is the booking you would like to check set for? Enter in YYYY-MM-DD format. ", bookings, "Please answer a valid date.")
+    date = str(date)
+    cur.execute(f"""SELECT Bookings.DateOfWork, Bookings.DateOrdered, Bookings.WorkComplete, Bookings.PaymentMethod, Bookings.HasPaid, Bookings.Address FROM Bookings WHERE Bookings.CustomerID = {id} AND Bookings.DateOfWork = '{date}';""")
+    results = cur.fetchall()
+    print(f"Date Of Work: {results[0][0]}, Date Ordered: {results[0][1]}, Work Complete: {results[0][2]}, Payment Method: {results[0][3]}, Has Paid: {results[0][4]}, Address: {results[0][5]}")
+    goforward = input("Type anything when you would like to continue: ")
+    main()
 
 def changecustomerdetails(email):
     element = validateinput("What would you like to change about your account? (name, surname, email, phone number, or password) ", ['name', 'surname', 'email', 'phone number', 'password'], "Please choose one of: name, surname, email, phone number, or password")
@@ -137,7 +154,9 @@ def changecustomerdetails(email):
         element = "PhoneNumber"
     cur.execute(f"""UPDATE Customers SET "{element}" = '{newvalue}' WHERE Email = '{email}'; """)
     con.commit()
-    customerinterface()
+    print("Action successful.")
+    time.sleep(1.5)
+    main()
 
 def editbooking(email):
     print("")
@@ -154,9 +173,11 @@ def editbooking(email):
     elif element == "address":
         element = "Address"
     newvalue = input("What would you like to change this element to? ")
-    cur.execute(f"""UPDATE Bookings SET {element} = '{newvalue}' WHERE Bookings.CustomerID = {id};""")
+    cur.execute(f"""UPDATE Bookings SET {element} = '{newvalue}' WHERE Bookings.CustomerID = {id} AND Bookings.DateOfWork = '{date}';""")
     con.commit()
-    customerinterface()
+    print('Action successful')
+    time.sleep(1.5)
+    main()
 
 def addbooking(email):
     print("")
@@ -170,7 +191,9 @@ def addbooking(email):
     cur.execute(f"""INSERT INTO Bookings (CustomerID, DateOfWork, DateOrdered, WorkComplete, PaymentMethod, HasPaid, Address)
     VALUES ((SELECT Customers.ID FROM Customers WHERE Email = "{email}"), "{dateofwork}", "date('now')", 0, "{paymentmethod}", 0, "{address}");""")
     con.commit()
-    customerinterface()
+    print('Action successful')
+    time.sleep(1.5)
+    main()
         
 
 def createaccount(): #simply asks for information for a Customer record, and then puts it into the database.
@@ -235,11 +258,39 @@ def login(table):
 def employeeinterface():
     clearscreen()
     email = login("Mowers")
-    action = validateinput("Would you like to log hours or edit employee information? (log hours or edit info) ", ["log hours", "edit info"], "Please answer log hours or edit info.")
+    action = validateinput("Would you like to log hours, view jobs or edit employee information? (log hours, view jobs or edit info) ", ["log hours", "view jobs", "edit info"], "Please answer log hours, view jobs, or edit info.")
     if action == "log hours":
         loghours(email)
     elif action == "edit info":
         editinfo(email)
+    elif action == "view jobs":
+        viewjobs(email)
+    main()
+
+def viewjobs(email):
+    cur.execute(f"""SELECT DISTINCT
+    Bookings.DateOfWork
+FROM Jobs
+JOIN Mowers ON Jobs.MowerID = Mowers.ID
+JOIN "Services-Bookings" ON Jobs.ServiceBookingID = "Services-Bookings".ID
+JOIN Bookings ON "Services-Bookings".BookingID = Bookings.ID
+WHERE Mowers.Email = '{email}'
+ORDER BY Bookings.DateOfWork;""")
+    jobs = [row[0] for row in cur.fetchall()]
+    cur.execute(f"SELECT Jobs.MowerID FROM Jobs JOIN Mowers ON Jobs.MowerID = Mowers.ID WHERE Mowers.Email == '{email}'")
+    id = [row[0] for row in cur.fetchall()][0]
+    date = validateinput("What date is the job you'd like to check on? (In format YYYY-MM-DD) ", jobs, "Please enter a valid date.")
+    cur.execute(f"""SELECT Bookings.DateOfWork, Services.Name, Services.Hours, Bookings.Address
+FROM Jobs
+JOIN "Services-Bookings" AS sb ON Jobs.ServiceBookingID = sb.ID
+JOIN Bookings ON sb.BookingID = Bookings.ID
+JOIN Services ON sb.ServiceID = Services.ID
+WHERE Jobs.MowerID = '{id}' AND Bookings.DateOfWork = '{date}'
+ORDER BY Bookings.DateOfWork;""")
+    results = cur.fetchall()
+    print(f"Date of Work: {results[0][0]}, Service: {results[0][1]}, Hours Required: {results[0][2]}, Address: {results[0][3]};")
+    goforward = input("Input something if you want to continue: ")
+    main()
 
 def loghours(email):
     cur.execute(f"""SELECT Bookings.DateOfWork, Jobs.ID FROM Jobs JOIN "Services-Bookings" AS sb ON sb.ID = Jobs.ServiceBookingID JOIN Bookings ON Bookings.ID = sb.BookingID JOIN Mowers ON Mowers.ID = Jobs.MowerID WHERE Mowers.Email == '{email}';""")
@@ -261,8 +312,23 @@ def editinfo(email):
 def ownerinterface():
     email = login('Mowers')
     wipeorexecute = validateinput("Would you like to wipe the database or execute SQL? (wipe or execute) ", ["wipe", "execute"], "Please answer either wipe or execute")
-    sql = input("What is the SQL you would like to execute? ") #Owners are given the ability to execute SQL
-    cur.execute(f"{sql}")
+    if wipeorexecute == 'execute':
+        sql = input("What is the SQL you would like to execute? ") #Owners are given the ability to execute SQL
+        cur.execute(f"{sql}")
+        con.commit()
+    elif wipeorexecute == 'wipe':
+        wipedatabase()
+    main()
+
+def main():
+    clearscreen()
+    usertype = validateinput("Are you a customer, mower, or an owner? ", ['customer', 'mower', 'owner'], "Please enter one of the following values: employee, owner, or mower")
+    if usertype == 'customer':
+        customerinterface()
+    elif usertype == 'mower':
+        employeeinterface()
+    elif usertype == 'owner':
+        ownerinterface()
 
            
 con = sqlite3.connect("greenerdayslawncare.db") #connects or creates the database file
@@ -271,24 +337,5 @@ createtables(cur) #will create the tables if they don't exist
 addsampledata(cur) #adds sample data only if it is not already there
 con.commit()
 
-usertype = validateinput("Are you a customer, mower, or an owner? ", ['customer', 'mower', 'owner'], "Please enter one of the following values: employee, owner, or mower")
-if usertype == 'customer':
-    customerinterface()
-elif usertype == 'mower':
-    employeeinterface()
-elif usertype == 'owner':
-    ownerinterface()
-
 while True:
-    con = sqlite3.connect("greenerdayslawncare.db")
-    cur = con.cursor() #This is necessary to allow us to use SQL queries
-
-    choice = input("What do you want to do? ")
-    if choice == 'wipe':
-        wipedatabase(cur, ["Jobs", "Services-Bookings", "Mowers", "Services", "Bookings", "Customers"])
-    elif choice == 'sample data':
-        addsampledata(cur)
-
-    con.commit()
-    cur.close()
-    con.close()
+    main()
