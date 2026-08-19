@@ -3,7 +3,8 @@ If you would like to remove the sample data, you will have to log in to the 'own
 
 Customers and Mowers/Employees have set actions they can perform, and owners are given access to the SQL database directly.
 
-You can use any of the logins and associated bookings/jobs in the 
+You can use any of the logins and associated bookings/jobs from the sample data or database in the login, but these are recommended:
+
 Customer: Email is jacobhewitt@gmail.com, password is dingdong17.
 This customer has a booking occurring on 2026-08-19 which can be used for editing or viewing the booking.
 
