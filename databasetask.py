@@ -118,7 +118,7 @@ def customerinterface():
     clearscreen()
     loginchoice = validateinput("Do you want to log in to an existing account or create a new account? (log in or create account) ", ["log in", "create account"], "Please input one of the options: log in or create account")
     if loginchoice == "log in":
-        email = login()
+        email = login("Customers")
     elif loginchoice == "create account":
         createaccount()
     clearscreen()
@@ -221,12 +221,12 @@ Password: {password}""")
         con.commit()
     customerinterface() #sends back to the beginning of customer interface, meaning that they can log in if they want.
 
-def login():
+def login(table):
     print("logging in")
-    cur.execute("SELECT Email FROM Customers;")
+    cur.execute(f"SELECT Email FROM {table};")
     emails = [row[0] for row in cur.fetchall()]
     useremail = validateinput("What is the email associated with your account? ", emails, "Please input an email associated with an account.")
-    cur.execute(f"""SELECT Password FROM Customers WHERE Email = "{useremail}";""") #finds the associated password
+    cur.execute(f"""SELECT Password FROM {table} WHERE Email = "{useremail}";""") #finds the associated password
     password = cur.fetchone()[0]
     validateinput(f"What is the password associated with the account with {useremail}? ", password, "Incorrect. Please try again.")
     return useremail
@@ -234,9 +234,7 @@ def login():
 
 def employeeinterface():
     clearscreen()
-    cur.execute("SELECT Mowers.Email FROM Mowers")
-    emaillist = [row[0] for row in cur.fetchall()]
-    email = validateinput("What is your employee email? ", emaillist, "Please answer a valid employee email.")
+    email = login("Mowers")
     action = validateinput("Would you like to log hours or edit employee information? (log hours or edit info) ", ["log hours", "edit info"], "Please answer log hours or edit info.")
     if action == "log hours":
         loghours(email)
@@ -261,7 +259,11 @@ def editinfo(email):
     employeeinterface()
 
 def ownerinterface():
-    print('owner')
+    email = login('Mowers')
+    wipeorexecute = validateinput("Would you like to wipe the database or execute SQL? (wipe or execute) ", ["wipe", "execute"], "Please answer either wipe or execute")
+    sql = input("What is the SQL you would like to execute? ") #Owners are given the ability to execute SQL
+    cur.execute(f"{sql}")
+
            
 con = sqlite3.connect("greenerdayslawncare.db") #connects or creates the database file
 cur = con.cursor() #This is necessary to allow us to use SQL queries
