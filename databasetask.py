@@ -313,7 +313,8 @@ def ownerinterface():
     email = login('Mowers')
     wipeorexecute = validateinput("Would you like to wipe the database or execute SQL? (wipe or execute) ", ["wipe", "execute"], "Please answer either wipe or execute")
     if wipeorexecute == 'execute':
-        sql = input("What is the SQL you would like to execute? ") #Owners are given the ability to execute SQL
+        sql = input("What is the SQL you would like to execute? ") #Owners are given the ability to execute SQL.
+        #This is where SQL Queries such as the sample queries would occur
         cur.execute(f"{sql}")
         con.commit()
     elif wipeorexecute == 'wipe':
