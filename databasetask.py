@@ -118,7 +118,7 @@ def customerinterface(): #interface for customers to use
     clearscreen()
     loginchoice = validateinput("Do you want to log in to an existing account or create a new account? (log in or create account) ", ["log in", "create account"], "Please input one of the options: log in or create account")
     if loginchoice == "log in":
-        email = login("Customers")
+        email = login("Customers", False)
     elif loginchoice == "create account":
         createaccount()
     clearscreen()
@@ -244,9 +244,12 @@ Password: {password}""")
         con.commit()
     customerinterface() #sends back to the beginning of customer interface, meaning that they can log in if they want.
 
-def login(table):
+def login(table, optional):
     print("logging in")
-    cur.execute(f"SELECT Email FROM {table};")
+    if optional == False:
+        cur.execute(f"SELECT Email FROM {table};")
+    else:
+        cur.execute(f"SELECT Email FROM {table} WHERE Mowers.Owner = 1;")
     emails = [row[0] for row in cur.fetchall()]
     useremail = validateinput("What is the email associated with your account? ", emails, "Please input an email associated with an account.")
     cur.execute(f"""SELECT Password FROM {table} WHERE Email = "{useremail}";""") #finds the associated password
@@ -257,7 +260,7 @@ def login(table):
 
 def employeeinterface():
     clearscreen()
-    email = login("Mowers")
+    email = login("Mowers", False)
     action = validateinput("Would you like to log hours, view jobs or edit employee information? (log hours, view jobs or edit info) ", ["log hours", "view jobs", "edit info"], "Please answer log hours, view jobs, or edit info.")
     if action == "log hours":
         loghours(email)
@@ -310,7 +313,7 @@ def editinfo(email):
     employeeinterface()
 
 def ownerinterface():
-    email = login('Mowers')
+    email = login('Mowers', True)
     wipeorexecute = validateinput("Would you like to wipe the database or execute SQL? (wipe or execute) ", ["wipe", "execute"], "Please answer either wipe or execute")
     if wipeorexecute == 'execute':
         sql = input("What is the SQL you would like to execute? ") #Owners are given the ability to execute SQL.
